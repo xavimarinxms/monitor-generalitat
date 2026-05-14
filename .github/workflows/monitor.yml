@@ -14,24 +14,21 @@ jobs:
           TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
         run: |
-          curl -s "https://www.google.com/search?q=listas+pedagogia+generalitat+Catalunya+2025&hl=ca" \
-            -H "User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36" \
-            -H "Accept-Language: ca,es;q=0.9" | \
-            grep -o '<h3[^>]*>[^<]*</h3>' | \
-            sed 's/<[^>]*>//g' | \
-            head -4 > /tmp/result1.txt
+          R1=$(curl -s "https://treball.gencat.cat/ca/destacats/OPO/index.html" \
+            -H "User-Agent: Mozilla/5.0" | \
+            grep -i -o '<a[^>]*>[^<]*pedagog[^<]*</a>' | \
+            sed 's/<[^>]*>//g' | head -5)
 
-          curl -s "https://www.google.com/search?q=vetlladoras+generalitat+Catalunya+convocatoria+2025&hl=ca" \
-            -H "User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36" \
-            -H "Accept-Language: ca,es;q=0.9" | \
-            grep -o '<h3[^>]*>[^<]*</h3>' | \
-            sed 's/<[^>]*>//g' | \
-            head -4 > /tmp/result2.txt
+          R2=$(curl -s "https://treball.gencat.cat/ca/destacats/OPO/index.html" \
+            -H "User-Agent: Mozilla/5.0" | \
+            grep -i -o '<a[^>]*>[^<]*vetll[^<]*</a>' | \
+            sed 's/<[^>]*>//g' | head -5)
 
           FECHA=$(date '+%d/%m/%Y')
-          R1=$(cat /tmp/result1.txt | tr '\n' ' ')
-          R2=$(cat /tmp/result2.txt | tr '\n' ' ')
+
+          if [ -z "$R1" ]; then R1="Sense novetats"; fi
+          if [ -z "$R2" ]; then R2="Sense novetats"; fi
 
           curl -s -X POST "https://api.telegram.org/bot${TELEGRAM_TOKEN}/sendMessage" \
             -d "chat_id=${TELEGRAM_CHAT_ID}" \
-            -d "text=Monitor Generalitat - ${FECHA} | Pedagogia: ${R1} | Vetlladoras: ${R2}"
+            -d "text=v3 - Monitor Generalitat - ${FECHA} | Pedagogia: ${R1} | Vetlladoras: ${R2}"
