@@ -18,15 +18,16 @@ jobs:
           curl -s "https://educacio.gencat.cat/ca/serveis-tramits/treballa-amb-nosaltres/borses-treball/" -H "User-Agent: Mozilla/5.0" > /tmp/p2.txt
           curl -s "https://www.sindicat.net/borsa-personal-docent/" -H "User-Agent: Mozilla/5.0" > /tmp/p3.txt
 
-          ORI=$(cat /tmp/p1.txt /tmp/p3.txt | grep -i "orientaci\|PSI\|oberta\|convocatoria\|llista" | sed 's/<[^>]*>//g' | tr -s ' ' | head -1)
-          VET=$(cat /tmp/p2.txt | grep -i "vetll\|educador.*especial\|EEE\|oberta\|convocatoria" | sed 's/<[^>]*>//g' | tr -s ' ' | head -1)
+          # Extreure text net i buscar paraules clau
+          ORI=$(cat /tmp/p1.txt /tmp/p3.txt | sed 's/<[^>]*>//g' | tr -s ' \t' ' ' | grep -i "orientaci\|PSI\|oberta\|convocatoria\|llista" | grep -v "^[[:space:]]*$" | head -1 | xargs)
+          VET=$(cat /tmp/p2.txt | sed 's/<[^>]*>//g' | tr -s ' \t' ' ' | grep -i "vetll\|educador.*especial\|EEE\|personal laboral\|convocatoria" | grep -v "^[[:space:]]*$" | head -1 | xargs)
 
           FECHA=$(date '+%d/%m/%Y')
 
           if [ -z "$ORI" ]; then ORI_MSG="Sense novetats"; else ORI_MSG="${ORI} - https://educacio.gencat.cat/ca/serveis-tramits/treballa-amb-nosaltres/borses-treball/personal-interi-docent/incorporacio-borsa/"; fi
           if [ -z "$VET" ]; then VET_MSG="Sense novetats"; else VET_MSG="${VET} - https://educacio.gencat.cat/ca/serveis-tramits/treballa-amb-nosaltres/borses-treball/"; fi
 
-          printf "v4 - Monitor %s\nOrientadora: %s\nVetlladora: %s" "$FECHA" "$ORI_MSG" "$VET_MSG" > /tmp/msg.txt
+          printf "v5 - Monitor %s\nOrientadora: %s\nVetlladora: %s" "$FECHA" "$ORI_MSG" "$VET_MSG" > /tmp/msg.txt
 
           curl -s -X POST "https://api.telegram.org/bot${TELEGRAM_TOKEN}/sendMessage" \
             -d "chat_id=${TELEGRAM_CHAT_ID}" \
