@@ -2,8 +2,8 @@ name: Monitor Generalitat
 
 on:
   schedule:
-    - cron: '0 8 * * *'  # Cada día a las 8:00 UTC (10:00 hora España)
-  workflow_dispatch:       # También permite ejecutarlo manualmente
+    - cron: '0 8 * * *'
+  workflow_dispatch:
 
 jobs:
   monitor:
@@ -14,31 +14,18 @@ jobs:
           TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
         run: |
-          # Buscar información sobre listas pedagogia
           RESULT1=$(curl -s "https://html.duckduckgo.com/html/?q=listas+pedagogia+generalitat+Catalunya+2025+convocatoria" \
             -H "User-Agent: Mozilla/5.0" | \
             grep -o '<a class="result__a"[^>]*>[^<]*</a>' | \
             sed 's/<[^>]*>//g' | head -5)
 
-          # Buscar información sobre vetlladoras
-          RESULT2=$(curl -s "https://html.duckduckgo.com/html/?q=vetlladoras+vetladores+generalitat+Catalunya+convocatoria+2025" \
+          RESULT2=$(curl -s "https://html.duckduckgo.com/html/?q=vetlladoras+generalitat+Catalunya+convocatoria+2025" \
             -H "User-Agent: Mozilla/5.0" | \
             grep -o '<a class="result__a"[^>]*>[^<]*</a>' | \
             sed 's/<[^>]*>//g' | head -5)
 
-          # Construir mensaje
           FECHA=$(date '+%d/%m/%Y')
-          MENSAJE="📋 Monitor Generalitat - $FECHA
 
-🎓 Pedagogia:
-$RESULT1
-
-👁️ Vetlladoras:
-$RESULT2
-
-🔗 Comprova: gencat.cat"
-
-          # Enviar por Telegram
-          curl -s -X POST "https://api.telegram.org/bot$TELEGRAM_TOKEN/sendMessage" \
-            -d "chat_id=$TELEGRAM_CHAT_ID" \
-            --data-urlencode "text=$MENSAJE"
+          curl -s -X POST "https://api.telegram.org/bot${TELEGRAM_TOKEN}/sendMessage" \
+            -d "chat_id=${TELEGRAM_CHAT_ID}" \
+            -d "text=Monitor Generalitat - ${FECHA}%0A%0APedagogia:%0A${RESULT1}%0A%0AVetlladoras:%0A${RESULT2}%0A%0AComprova: gencat.cat"
