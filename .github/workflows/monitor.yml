@@ -23,22 +23,11 @@ jobs:
 
           FECHA=$(date '+%d/%m/%Y')
 
-          if [ -z "$ORI" ]; then
-            ORI_MSG="Sense novetats"
-          else
-            ORI_MSG="${ORI} - https://educacio.gencat.cat/ca/serveis-tramits/treballa-amb-nosaltres/borses-treball/personal-interi-docent/incorporacio-borsa/"
-          fi
+          if [ -z "$ORI" ]; then ORI_MSG="Sense novetats"; else ORI_MSG="${ORI} - https://educacio.gencat.cat/ca/serveis-tramits/treballa-amb-nosaltres/borses-treball/personal-interi-docent/incorporacio-borsa/"; fi
+          if [ -z "$VET" ]; then VET_MSG="Sense novetats"; else VET_MSG="${VET} - https://educacio.gencat.cat/ca/serveis-tramits/treballa-amb-nosaltres/borses-treball/"; fi
 
-          if [ -z "$VET" ]; then
-            VET_MSG="Sense novetats"
-          else
-            VET_MSG="${VET} - https://educacio.gencat.cat/ca/serveis-tramits/treballa-amb-nosaltres/borses-treball/"
-          fi
-
-          MSG="Monitor ${FECHA}
-Orientadora: ${ORI_MSG}
-Vetlladora: ${VET_MSG}"
+          printf "v4 - Monitor %s\nOrientadora: %s\nVetlladora: %s" "$FECHA" "$ORI_MSG" "$VET_MSG" > /tmp/msg.txt
 
           curl -s -X POST "https://api.telegram.org/bot${TELEGRAM_TOKEN}/sendMessage" \
             -d "chat_id=${TELEGRAM_CHAT_ID}" \
-            --data-urlencode "text=${MSG}"
+            --data-urlencode "text@/tmp/msg.txt"
