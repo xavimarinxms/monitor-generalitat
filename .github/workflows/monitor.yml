@@ -14,15 +14,15 @@ jobs:
           TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
         run: |
-          R1=$(curl -s "https://treball.gencat.cat/ca/destacats/OPO/index.html" \
+          R1=$(curl -s "https://educacio.gencat.cat/ca/arees-actuacio/professors/oposicions/" \
             -H "User-Agent: Mozilla/5.0" | \
-            grep -i -o '<a[^>]*>[^<]*pedagog[^<]*</a>' | \
-            sed 's/<[^>]*>//g' | head -5)
+            grep -i "pedagog\|llista\|borsa" | \
+            sed 's/<[^>]*>//g' | tr -s ' ' | head -3)
 
-          R2=$(curl -s "https://treball.gencat.cat/ca/destacats/OPO/index.html" \
+          R2=$(curl -s "https://educacio.gencat.cat/ca/arees-actuacio/professors/oposicions/" \
             -H "User-Agent: Mozilla/5.0" | \
-            grep -i -o '<a[^>]*>[^<]*vetll[^<]*</a>' | \
-            sed 's/<[^>]*>//g' | head -5)
+            grep -i "vetll" | \
+            sed 's/<[^>]*>//g' | tr -s ' ' | head -3)
 
           FECHA=$(date '+%d/%m/%Y')
 
