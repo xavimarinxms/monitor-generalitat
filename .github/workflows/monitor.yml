@@ -14,15 +14,19 @@ jobs:
           TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
         run: |
-          curl -s "https://html.duckduckgo.com/html/?q=listas+pedagogia+generalitat+Catalunya+2025" \
-            -H "User-Agent: Mozilla/5.0" | \
-            grep -o '<a class="result__a"[^>]*>[^<]*</a>' | \
-            sed 's/<[^>]*>//g' | head -3 > /tmp/result1.txt
+          curl -s "https://www.google.com/search?q=listas+pedagogia+generalitat+Catalunya+2025&hl=ca" \
+            -H "User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36" \
+            -H "Accept-Language: ca,es;q=0.9" | \
+            grep -o '<h3[^>]*>[^<]*</h3>' | \
+            sed 's/<[^>]*>//g' | \
+            head -4 > /tmp/result1.txt
 
-          curl -s "https://html.duckduckgo.com/html/?q=vetlladoras+generalitat+Catalunya+2025" \
-            -H "User-Agent: Mozilla/5.0" | \
-            grep -o '<a class="result__a"[^>]*>[^<]*</a>' | \
-            sed 's/<[^>]*>//g' | head -3 > /tmp/result2.txt
+          curl -s "https://www.google.com/search?q=vetlladoras+generalitat+Catalunya+convocatoria+2025&hl=ca" \
+            -H "User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36" \
+            -H "Accept-Language: ca,es;q=0.9" | \
+            grep -o '<h3[^>]*>[^<]*</h3>' | \
+            sed 's/<[^>]*>//g' | \
+            head -4 > /tmp/result2.txt
 
           FECHA=$(date '+%d/%m/%Y')
           R1=$(cat /tmp/result1.txt | tr '\n' ' ')
