@@ -14,18 +14,20 @@ jobs:
           TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
         run: |
-          RESULT1=$(curl -s "https://html.duckduckgo.com/html/?q=listas+pedagogia+generalitat+Catalunya+2025+convocatoria" \
+          curl -s "https://html.duckduckgo.com/html/?q=listas+pedagogia+generalitat+Catalunya+2025" \
             -H "User-Agent: Mozilla/5.0" | \
             grep -o '<a class="result__a"[^>]*>[^<]*</a>' | \
-            sed 's/<[^>]*>//g' | head -5)
+            sed 's/<[^>]*>//g' | head -3 > /tmp/result1.txt
 
-          RESULT2=$(curl -s "https://html.duckduckgo.com/html/?q=vetlladoras+generalitat+Catalunya+convocatoria+2025" \
+          curl -s "https://html.duckduckgo.com/html/?q=vetlladoras+generalitat+Catalunya+2025" \
             -H "User-Agent: Mozilla/5.0" | \
             grep -o '<a class="result__a"[^>]*>[^<]*</a>' | \
-            sed 's/<[^>]*>//g' | head -5)
+            sed 's/<[^>]*>//g' | head -3 > /tmp/result2.txt
 
           FECHA=$(date '+%d/%m/%Y')
+          R1=$(cat /tmp/result1.txt | tr '\n' ' ')
+          R2=$(cat /tmp/result2.txt | tr '\n' ' ')
 
           curl -s -X POST "https://api.telegram.org/bot${TELEGRAM_TOKEN}/sendMessage" \
             -d "chat_id=${TELEGRAM_CHAT_ID}" \
-            -d "text=Monitor Generalitat - ${FECHA}%0A%0APedagogia:%0A${RESULT1}%0A%0AVetlladoras:%0A${RESULT2}%0A%0AComprova: gencat.cat"
+            -d "text=Monitor Generalitat - ${FECHA} | Pedagogia: ${R1} | Vetlladoras: ${R2}"
